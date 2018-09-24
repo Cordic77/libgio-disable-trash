@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="client-nojs">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<head>
+    <meta charset="UTF-8">
+    <title>Globally disable GNOME's Trash in Debian-based distributions</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="http://www.theitcommunity.com/skins/common/images/TheITCommunityLogo.png">
+    <meta property="og:site_name" content="The IT Community">
+    <meta property="fb:admins" content="100004759327592,534520789899444">
+    <meta name="google-translate-customization" content="15fa57a5a8891488-685096bb5bb00d93-ga81cbd71ba271a2f-17">
+
+    <style type="text/css">
+
+        a:link {
+            text-decoration: none;
+            color: blue;
+        }
+
+        a:visited {
+            text-decoration: none;
+            color: blue;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: blue;
+        }
+
+        #top-bar {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            z-index: 999;
+            height: 50px;
+            background-color: #000;
+        }
+
+        .topbar-inner {
+            margin-left: 20px;
+            display: inline-block;
+            zoom: 1;
+            *display: inline;
+        }
+
+        .topbar-login {
+            position: absolute;
+            right: 50px;
+            display: inline-block;
+            zoom: 1;
+            *display: inline;
+        }
+
+        .topbar-menuinner {
+            margin-left: 20px;
+            display: inline-block;
+            zoom: 1;
+            *display: inline;
+        }
+
+        .topbar-menuitems {
+            margin-left: 70px;
+            display: inline-block;
+            zoom: 1;
+            *display: inline;
+            background-color: #000;
+        }
+
+        .topbar-menuitem {
+            margin-left: 25px;
+            display: inline-block;
+            zoom: 1;
+            *display: inline;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content" class="mw-body" role="main">
+        <a id="top"></a>
+        <h1 id="firstHeading" class="firstHeading" lang="en">
+        <span dir="auto">Globally disable GNOME's Trash in Debian-based distributions</span>
+        </h1>
+        <div id="bodyContent">
+            <table style="width:100%">
+                <tr>
+                    <td style="vertical-align:top;width:*">
+                        <div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr">
+                            <p>
+                                GNOME's built-in Trash has one particularly annoying feature: every time one deletes a file on a mounted drive, a "<b>.Trash-&lt;UID&gt;</b>" folder is created. This happens regardless of whether the storage device in question is formatted with a Linux filesystem, or not (e.g. USB flash drives or Windows shared folders).
+                            </p><p>
+                                If you are like me and want the Trash gone for good, here is a solution that will disable this "feature" globally, system-wide for everyone:
+                            </p>
+                            <br/><ol start="0">
+                                <li>
+                                    BEWARE: this guide proposes to replace GNOME's <b>libgio</b> with a custom-compiled version which re-routes all calls of <b>g_file_trash()</b> to its pendant <b>g_file_delete()</b>. <br/>Modifying system libraries is not without risks – <b>I cannot accept any responsibility for any loss, disruption or damage to your data or computer system which may occur as a result of following the steps provided in this guide!</b><br/>Also, the following procedure will need to be repeated every time a system update causes a new <b>libglib</b> to be installed:<p><code>$ sudo apt-get dist-upgrade<br/>Reading package lists... Done<br/>Building dependency tree<br/>Reading state information... Done<br/>Calculating upgrade... Done<br/>The following packages will be upgraded:<br/> libglib2.0-0</code></p>
+                                </li>
+                                <br/>
+                                <li>
+                                    Before getting started, make sure the latest updates are installed:<p><code>$ sudo apt-get dist-upgrade</code></p>Also, it would be wise to get answers to some basic questions first:
+                                    <ul>
+                                        <li>
+                                            Which package contains <a rel="nofollow" target="_blank" class="external text" href="http://en.wikipedia.org/wiki/GIO_(software)">GIO</a>?<p><code>$ apt-file search -x 'libgio-.*?\.so'<br/>libglib2.0-0: /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0<br/>libglib2.0-0: /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1</code></p>See also: <a rel="nofollow" target="_blank" class="external text" href="http://en.wikipedia.org/wiki/GLib">Glib</a>
+                                        </li>
+                                        <li>
+                                            Where are these files located?<p><code>$ locate libgio-2.0.so.0.5600.1<br/>/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1</code></p><b>Note:</b> all commands given in the remainder of this guide will refer to this specific version of <b>libgio</b> – on other systems, some adjustments will be necessary!
+                                        </li>
+                                    </ul>
+                                </li>
+                                <br/>
+                                <li>
+                                    Download source package for <b>libglib-2.0.0</b>:<p><code>$ sudo apt-get source libglib2.0-0<br/>$ ls -l<br/><b>drwxr-xr-x 14 root root 4096 2015-05-01 11:03 glib2.0-2.56.1</b><br/>-rw-r--r-- 1 root root 68072 2014-11-12 23:24 glib2.0_2.56.1-1.debian.tar.xz<br/>-rw-r--r-- 1 root root 3119 2014-11-12 23:24 glib2.0_2.56.1-1.dsc<br/>-rw-r--r-- 1 root root 6985120 2014-11-12 23:24 glib2.0_2.56.1.orig.tar.xz</code></p>
+                                </li>
+                                <br/>
+                                <li>
+                                    Install build dependencies for <b>libglib-2.0.0</b>:<p><code>$ sudo apt-get build-dep libglib2.0-0</code></p>
+                                </li>
+                                <br/>
+                                <li>Extract <b>glib2.0_2.56.1.orig.tar.xz</b> into a newly created subdirectory <b>./extr</b>:<p><code>$ mkdir -p extr &amp;&amp; tar xf glib2.0_2.56.1.orig.tar.xz -C extr/ &amp;&amp; cd extr</code></p></li>
+                                <br/>
+                                <li>
+                                    Open the file „<b>glib-2.56.1/gio/gfile.c</b>“ in an editor of your choice, locate the function <b>g_file_trash()</b> and replace its body with a<br/>single <b>return (g_file_delete (...))</b> statement, as shown below (any existing code code should be commented out with <code>/* ... */</code>):<p><code>$ sudo gedit glib-2.56.1/gio/gfile.c</code></p>
+                                </li>
+                            </ol>
+<pre>gboolean
+g_file_trash (GFile         *file,
+              GCancellable  *cancellable,
+              GError       **error)
+{
+  /* (Unconditionally) bypass the trash: */
+  return (g_file_delete (file, cancellable, error));
+
+/*// Existing code commented out:
+  GFileIface *iface;
+
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
+
+  iface = G_FILE_GET_IFACE (file);
+
+  if (iface-&gt;trash == NULL)
+    {
+      g_set_error_literal (error,
+                          G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                          _("Trash not supported"));
+      return FALSE;
+    }
+
+  return (* iface-&gt;trash) (file, cancellable, error);
+*/
+}
+</pre>
+                            <ol start="6">
+                                <ul>
+                                    <li>
+                                        A comparison of this (modified) <b>gfile.c</b> with the one in the <b>glib2.0-2.56.1</b> directory downloaded in step 2 should now reveal a single change:<p><code>$ diff -b glib-2.56.1/gio/gfile.c ../glib2.0-2.56.1/gio/gfile.c<br/>3991,3994d3990<br/>&lt; /* (Unconditionally) bypass the trash: */<br/>&lt; return (g_file_delete (file, cancellable, error));&lt;<br/>&lt; /*// Existing code commented out:<br/>4013d4008<br/>&lt; */</code></p>
+                                    </li>
+                                    <li>
+                                        If the comparison in the previous step checks out, we're ready to proceed:<p># Copy the modified <b>gfile.c</b> over the one <b>extracted in step 2</b>:<br/><code>$ sudo cp -a glib-2.56.1/gio/gfile.c ../glib2.0-2.56.1/gio/gfile.c</code><br/><br/># Repack the <b>glib2.0_2.56.1.orig.tar.xz</b> archive:<br/><code>$ sudo tar cJf ../glib2.0_2.56.1.orig.tar.xz . &amp;&amp; cd ..<br/>$ ls -l glib2.0_2.56.1.orig.tar.xz<br/>-rw-r--r-- 1 root root 7312816 glib2.0_2.56.1.orig.tar.xz</code><br/><br/># Remove the temporary <b>extr</b> directory:<br/><code>sudo rm -rf extr/</code></p><br/>
+                                    </li>
+                                </ul>
+                                <li>
+                                    Change into the <b>glib2.0-2.56.1</b> directory downloaded in step 2, log in as the root user and run <b>dpkg-buildpackage</b>:<p><code>$ cd glib2.0-2.56.1/<br/>$ sudo su root<br/># dpkg-buildpackage</code></p><b>Notes:</b>
+                                    <ol>
+                                        <li>
+                                            In some cases, one of GLib's automated tests may "hang", thus preventing <b>dpkg-buildpackage</b> from completing the build:<p><code>PASS: gsettings 23 /gsettings/no-read-binding<br/>^Cmake[9]: *** Deleting file 'gsettings.log'<br/>Makefile:4163: recipe for target 'gsettings.log' failed<br/>make[9]: *** [gsettings.log] Interrupt</code></p>
+                                        </li>
+                                        <li>
+                                            If one is willing to skip the test suite, it's possible to solve this by invoking <b>dpkg-buildpackage</b> with the <b>nocheck</b> option (after having aborted the hanging test with <b>&lt;Ctrl-C&gt;</b>):<p><code># DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage</code></p>
+                                        </li>
+                                    </ol>
+                                </li>
+                                <br/>
+                                <li>
+                                    A successful run of <b>dpkg-buildpackage</b> will result in a set of newly created <b>.DEB archives</b>, which could be installed with <b>dpkg</b>:<p><code># exit<br/>$ ls -l ../*.deb<br/>-rw-r--r-- 1 root root 2400624 ../libglib2.0-0_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 6827444 ../libglib2.0-0-dbg_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 1674442 ../libglib2.0-0-refdbg_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 1335798 ../libglib2.0-bin_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 2172456 ../libglib2.0-data_2.56.1-1_all.deb<br/>-rw-r--r-- 1 root root 2645490 ../libglib2.0-dev_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 2677670 ../libglib2.0-doc_2.56.1-1_all.deb<br/>-rw-r--r-- 1 root root 2256398 ../libglib2.0-tests_2.56.1-1_amd64.de</code></p>
+                                </li>
+                                <br/>
+                                <li>
+                                    For our purposes, however, it is better to simply replace the systems <b>libgio-2.0.so.0.5600.1</b> with the newly compiled one (after making a backup copy):<br/># Backup current `libgio':<p><code>$ sudo cp -a /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1 /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1-installed</code></p>After that it's necessary to reboot the system into the <b>recovery mode</b>, as the last step won't work while the GUI is running:<br/># Install libgio's replacement:<p><code>root@deb:~# cd /home/&lt;your user&gt;/libglib2.0-0/glib2.0-2.56.1/<br/>root@deb:/.../glib2.0-2.56.1# find ./debian/libglib2.0-0/usr/lib/ -name 'libgio-2.0.so.0.*' | xargs ls -l<br/>-rw-r--r-- 1 root root 1541864 ./debian/libglib2.0-0/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1<br/>root@deb:/.../glib2.0-2.56.1# cp -a ./debian/libglib2.0-0/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1 /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1</code></p>
+                                    <p>
+                                        <b>Note:</b><br/>Please also make sure that all <b>libgio-2.0.so*</b> symlinks under <b>/usr/lib/x86_64-linux-gnu</b> actually point to this updated <b>libgio-2.0.so.0.5600.1</b>!
+                                    </p>
+                                </li>
+                                <br/>
+                                <li>
+                                    Reboot your system - the Trash will now no longer be used!
+                                </li>
+                            </ol>
+                        </div>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
