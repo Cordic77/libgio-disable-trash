@@ -102,26 +102,26 @@
                                     Before getting started, make sure the latest updates are installed:<p><code>$ sudo apt-get dist-upgrade</code></p>Also, it would be wise to get answers to some basic questions first:
                                     <ul>
                                         <li>
-                                            Which package contains <a rel="nofollow" target="_blank" class="external text" href="http://en.wikipedia.org/wiki/GIO_(software)">GIO</a>?<p><code>$ apt-file search -x 'libgio-.*?\.so'<br/>libglib2.0-0: /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0<br/>libglib2.0-0: /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1</code></p>See also: <a rel="nofollow" target="_blank" class="external text" href="http://en.wikipedia.org/wiki/GLib">Glib</a>
+                                            Which package contains <a rel="nofollow" target="_blank" class="external text" href="http://en.wikipedia.org/wiki/GIO_(software)">GIO</a>?<p><code>$ apt-file search -x 'libgio-.*?\.so'<br/>libglib2.0-0: /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0<br/>libglib2.0-0: /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5800.1</code></p>See also: <a rel="nofollow" target="_blank" class="external text" href="http://en.wikipedia.org/wiki/GLib">Glib</a>
                                         </li>
                                         <li>
-                                            Where are these files located?<p><code>$ locate libgio-2.0.so.0.5600.1<br/>/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1</code></p><b>Note:</b> all commands given in the remainder of this guide will refer to this specific version of <b>libgio</b> – on other systems, some adjustments will be necessary!
+                                            Where are these files located?<p><code>$ locate libgio-2.0.so.0.5800.1<br/>/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5800.1</code></p><b>Note:</b> all commands given in the remainder of this guide will refer to this specific version of <b>libgio</b> – on other systems, some adjustments will be necessary!
                                         </li>
                                     </ul>
                                 </li>
                                 <br/>
                                 <li>
-                                    Download source package for <b>libglib-2.0.0</b>:<p><code>$ sudo apt-get source libglib2.0-0<br/>$ ls -l<br/><b>drwxr-xr-x 14 root root 4096 2015-05-01 11:03 glib2.0-2.56.1</b><br/>-rw-r--r-- 1 root root 68072 2014-11-12 23:24 glib2.0_2.56.1-1.debian.tar.xz<br/>-rw-r--r-- 1 root root 3119 2014-11-12 23:24 glib2.0_2.56.1-1.dsc<br/>-rw-r--r-- 1 root root 6985120 2014-11-12 23:24 glib2.0_2.56.1.orig.tar.xz</code></p>
+                                    Download source package for <b>libglib-2.0.0</b>:<p><code>$ sudo apt-get source libglib2.0-0<br/>$ ls -l<br/><b>drwxr-xr-x 14 root root 4096 2015-05-01 11:03 glib2.0-2.58.1</b><br/>-rw-r--r-- 1 root root 68072 2014-11-12 23:24 glib2.0_2.58.1-2.debian.tar.xz<br/>-rw-r--r-- 1 root root 3119 2014-11-12 23:24 glib2.0_2.58.1-2.dsc<br/>-rw-r--r-- 1 root root 6985120 2014-11-12 23:24 glib2.0_2.58.1.orig.tar.xz</code></p>
                                 </li>
                                 <br/>
                                 <li>
                                     Install build dependencies for <b>libglib-2.0.0</b>:<p><code>$ sudo apt-get build-dep libglib2.0-0</code></p>
                                 </li>
                                 <br/>
-                                <li>Extract <b>glib2.0_2.56.1.orig.tar.xz</b> into a newly created subdirectory <b>./extr</b>:<p><code>$ mkdir -p extr &amp;&amp; tar xf glib2.0_2.56.1.orig.tar.xz -C extr/ &amp;&amp; cd extr</code></p></li>
+                                <li>Extract <b>glib2.0_2.58.1.orig.tar.xz</b> into a newly created subdirectory <b>./extr</b>:<p><code>$ mkdir -p extr &amp;&amp; tar xf glib2.0_2.58.1.orig.tar.xz -C extr/ &amp;&amp; cd extr</code></p></li>
                                 <br/>
                                 <li>
-                                    Open the file „<b>glib-2.56.1/gio/gfile.c</b>“ in an editor of your choice, locate the function <b>g_file_trash()</b> and replace its body with a<br/>single <b>return (g_file_delete (...))</b> statement, as shown below (any existing code code should be commented out with <code>/* ... */</code>):<p><code>$ sudo gedit glib-2.56.1/gio/gfile.c</code></p>
+                                    Open the file „<b>glib-2.58.1/gio/gfile.c</b>“ in an editor of your choice, locate the function <b>g_file_trash()</b> and replace its body with a<br/>single <b>return (g_file_delete (...))</b> statement, as shown below (any existing code code should be commented out with <code>/* ... */</code>):<p><code>$ sudo gedit glib-2.58.1/gio/gfile.c</code></p>
                                 </li>
                             </ol>
 <pre>gboolean
@@ -157,14 +157,14 @@ g_file_trash (GFile         *file,
                             <ol start="6">
                                 <ul>
                                     <li>
-                                        A comparison of this (modified) <b>gfile.c</b> with the one in the <b>glib2.0-2.56.1</b> directory downloaded in step 2 should now reveal a single change:<p><code>$ diff -b glib-2.56.1/gio/gfile.c ../glib2.0-2.56.1/gio/gfile.c<br/>3991,3994d3990<br/>&lt; /* (Unconditionally) bypass the trash: */<br/>&lt; return (g_file_delete (file, cancellable, error));&lt;<br/>&lt; /*// Existing code commented out:<br/>4013d4008<br/>&lt; */</code></p>
+                                        A comparison of this (modified) <b>gfile.c</b> with the one in the <b>glib2.0-2.58.1</b> directory downloaded in step 2 should now reveal a single change:<p><code>$ diff -b glib-2.58.1/gio/gfile.c ../glib2.0-2.58.1/gio/gfile.c<br/>3991,3994d3990<br/>&lt; /* (Unconditionally) bypass the trash: */<br/>&lt; return (g_file_delete (file, cancellable, error));&lt;<br/>&lt; /*// Existing code commented out:<br/>4013d4008<br/>&lt; */</code></p>
                                     </li>
                                     <li>
-                                        If the comparison in the previous step checks out, we're ready to proceed:<p># Copy the modified <b>gfile.c</b> over the one <b>extracted in step 2</b>:<br/><code>$ sudo cp -a glib-2.56.1/gio/gfile.c ../glib2.0-2.56.1/gio/gfile.c</code><br/><br/># Repack the <b>glib2.0_2.56.1.orig.tar.xz</b> archive:<br/><code>$ sudo tar cJf ../glib2.0_2.56.1.orig.tar.xz . &amp;&amp; cd ..<br/>$ ls -l glib2.0_2.56.1.orig.tar.xz<br/>-rw-r--r-- 1 root root 7312816 glib2.0_2.56.1.orig.tar.xz</code><br/><br/># Remove the temporary <b>extr</b> directory:<br/><code>sudo rm -rf extr/</code></p><br/>
+                                        If the comparison in the previous step checks out, we're ready to proceed:<p># Copy the modified <b>gfile.c</b> over the one <b>extracted in step 2</b>:<br/><code>$ sudo cp -a glib-2.58.1/gio/gfile.c ../glib2.0-2.58.1/gio/gfile.c</code><br/><br/># Repack the <b>glib2.0_2.58.1.orig.tar.xz</b> archive:<br/><code>$ sudo tar cJf ../glib2.0_2.58.1.orig.tar.xz . &amp;&amp; cd ..<br/>$ ls -l glib2.0_2.58.1.orig.tar.xz<br/>-rw-r--r-- 1 root root 7312816 glib2.0_2.58.1.orig.tar.xz</code><br/><br/># Remove the temporary <b>extr</b> directory:<br/><code>sudo rm -rf extr/</code></p><br/>
                                     </li>
                                 </ul>
                                 <li>
-                                    Change into the <b>glib2.0-2.56.1</b> directory downloaded in step 2, log in as the root user and run <b>dpkg-buildpackage</b>:<p><code>$ cd glib2.0-2.56.1/<br/>$ sudo su root<br/># dpkg-buildpackage</code></p><b>Notes:</b>
+                                    Change into the <b>glib2.0-2.58.1</b> directory downloaded in step 2, log in as the root user and run <b>dpkg-buildpackage</b>:<p><code>$ cd glib2.0-2.58.1/<br/>$ sudo su root<br/># dpkg-buildpackage</code></p><b>Notes:</b>
                                     <ol>
                                         <li>
                                             In some cases, one of GLib's automated tests may "hang", thus preventing <b>dpkg-buildpackage</b> from completing the build:<p><code>PASS: gsettings 23 /gsettings/no-read-binding<br/>^Cmake[9]: *** Deleting file 'gsettings.log'<br/>Makefile:4163: recipe for target 'gsettings.log' failed<br/>make[9]: *** [gsettings.log] Interrupt</code></p>
@@ -176,13 +176,13 @@ g_file_trash (GFile         *file,
                                 </li>
                                 <br/>
                                 <li>
-                                    A successful run of <b>dpkg-buildpackage</b> will result in a set of newly created <b>.DEB archives</b>, which could be installed with <b>dpkg</b>:<p><code># exit<br/>$ ls -l ../*.deb<br/>-rw-r--r-- 1 root root 2400624 ../libglib2.0-0_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 6827444 ../libglib2.0-0-dbg_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 1674442 ../libglib2.0-0-refdbg_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 1335798 ../libglib2.0-bin_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 2172456 ../libglib2.0-data_2.56.1-1_all.deb<br/>-rw-r--r-- 1 root root 2645490 ../libglib2.0-dev_2.56.1-1_amd64.deb<br/>-rw-r--r-- 1 root root 2677670 ../libglib2.0-doc_2.56.1-1_all.deb<br/>-rw-r--r-- 1 root root 2256398 ../libglib2.0-tests_2.56.1-1_amd64.de</code></p>
+                                    A successful run of <b>dpkg-buildpackage</b> will result in a set of newly created <b>.DEB archives</b>, which could be installed with <b>dpkg</b>:<p><code># exit<br/>$ ls -l ../*.deb<br/>-rw-r--r-- 1 root root 2400624 ../libglib2.0-0_2.58.1-2_amd64.deb<br/>-rw-r--r-- 1 root root 6827444 ../libglib2.0-0-dbg_2.58.1-2_amd64.deb<br/>-rw-r--r-- 1 root root 1674442 ../libglib2.0-0-refdbg_2.58.1-2_amd64.deb<br/>-rw-r--r-- 1 root root 1335798 ../libglib2.0-bin_2.58.1-2_amd64.deb<br/>-rw-r--r-- 1 root root 2172456 ../libglib2.0-data_2.58.1-2_all.deb<br/>-rw-r--r-- 1 root root 2645490 ../libglib2.0-dev_2.58.1-2_amd64.deb<br/>-rw-r--r-- 1 root root 2677670 ../libglib2.0-doc_2.58.1-2_all.deb<br/>-rw-r--r-- 1 root root 2256398 ../libglib2.0-tests_2.58.1-2_amd64.de</code></p>
                                 </li>
                                 <br/>
                                 <li>
-                                    For our purposes, however, it is better to simply replace the systems <b>libgio-2.0.so.0.5600.1</b> with the newly compiled one (after making a backup copy):<br/># Backup current `libgio':<p><code>$ sudo cp -a /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1 /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1-installed</code></p>After that it's necessary to reboot the system into the <b>recovery mode</b>, as the last step won't work while the GUI is running:<br/># Install libgio's replacement:<p><code>root@deb:~# cd /home/&lt;your user&gt;/libglib2.0-0/glib2.0-2.56.1/<br/>root@deb:/.../glib2.0-2.56.1# find ./debian/libglib2.0-0/usr/lib/ -name 'libgio-2.0.so.0.*' | xargs ls -l<br/>-rw-r--r-- 1 root root 1541864 ./debian/libglib2.0-0/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1<br/>root@deb:/.../glib2.0-2.56.1# cp -a ./debian/libglib2.0-0/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1 /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5600.1</code></p>
+                                    For our purposes, however, it is better to simply replace the systems <b>libgio-2.0.so.0.5800.1</b> with the newly compiled one (after making a backup copy):<br/># Backup current `libgio':<p><code>$ sudo cp -a /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5800.1 /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5800.1-installed</code></p>After that it's necessary to reboot the system into the <b>recovery mode</b>, as the last step won't work while the GUI is running:<br/># Install libgio's replacement:<p><code>root@deb:~# cd /home/&lt;your user&gt;/libglib2.0-0/glib2.0-2.58.1/<br/>root@deb:/.../glib2.0-2.58.1# find ./debian/libglib2.0-0/usr/lib/ -name 'libgio-2.0.so.0.*' | xargs ls -l<br/>-rw-r--r-- 1 root root 1541864 ./debian/libglib2.0-0/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5800.1<br/>root@deb:/.../glib2.0-2.58.1# cp -a ./debian/libglib2.0-0/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5800.1 /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.5800.1</code></p>
                                     <p>
-                                        <b>Note:</b><br/>Please also make sure that all <b>libgio-2.0.so*</b> symlinks under <b>/usr/lib/x86_64-linux-gnu</b> actually point to this updated <b>libgio-2.0.so.0.5600.1</b>!
+                                        <b>Note:</b><br/>Please also make sure that all <b>libgio-2.0.so*</b> symlinks under <b>/usr/lib/x86_64-linux-gnu</b> actually point to this updated <b>libgio-2.0.so.0.5800.1</b>!
                                     </p>
                                 </li>
                                 <br/>
